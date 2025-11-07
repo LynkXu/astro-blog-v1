@@ -17,7 +17,7 @@ title: 友链
 名称：子舒的博客
 简介：想留下点什么，证明我来过，一个热爱生活的程序员。
 域名：https://zishu.me
-图标：https://imgurl.zishu.me/favicon.png
+logo：https://zishu.me/favicon.ico
 ```
 
 - [涛叔](https://taoshu.in/)
