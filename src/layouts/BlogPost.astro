@@ -9,7 +9,10 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage, tags, categories } = Astro.props;
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description || ''}>
+	<!-- LightGallery CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/css/lightgallery.min.css" slot="head">
+	
 	<p></p>
 	<h2>–</h2>
 	<h1>{title}</h1>
@@ -34,11 +37,56 @@ const { title, description, pubDate, updatedDate, heroImage, tags, categories } 
 	)}
 	</p>
 
-	<div class="post-content content">
+	<div class="post-content content" id="lightgallery">
 		<hr />
 		<slot />
 	</div>
 	
 	<!-- 评论组件 -->
 	<Comments showLinuxDo={true} />
+	
+	<!-- LightGallery JS -->
+	<script is:inline src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lightgallery.min.js"></script>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lg-zoom.min.js"></script>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lg-thumbnail.min.js"></script>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lg-fullscreen.min.js"></script>
+	
+	<!-- 初始化 LightGallery -->
+	<script is:inline>
+		document.addEventListener('DOMContentLoaded', function() {
+			// 为文章内容中的所有图片添加链接包装
+			const postContent = document.querySelector('.post-content');
+			if (postContent) {
+				const images = postContent.querySelectorAll('img');
+				images.forEach(function(img) {
+					// 如果图片已经被链接包裹，则跳过
+					if (img.parentElement.tagName === 'A') {
+						return;
+					}
+					
+					// 创建链接元素
+					const link = document.createElement('a');
+					link.href = img.src;
+					link.setAttribute('data-sub-html', img.alt || '');
+					
+					// 将图片包装在链接中
+					img.parentNode.insertBefore(link, img);
+					link.appendChild(img);
+				});
+				
+				// 初始化 lightGallery
+				lightGallery(document.getElementById('lightgallery'), {
+					selector: 'a[href$=".jpg"], a[href$=".jpeg"], a[href$=".png"], a[href$=".gif"], a[href$=".webp"]',
+					thumbnail: true,
+					animateThumb: true,
+					showThumbByDefault: false,
+					download: true,
+					zoom: true,
+					fullScreen: true,
+					actualSize: true,
+					hash: false
+				});
+			}
+		});
+	</script>
 </Base>
