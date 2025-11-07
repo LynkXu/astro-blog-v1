@@ -1,10 +1,7 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
+import Base from './Base.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
 import Comments from '../components/Comments.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
@@ -12,47 +9,36 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage, tags, categories } = Astro.props;
 ---
 
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={title} description={description} />
-	</head>
+<Base title={title} description={description}>
+	<p></p>
+	<h2>–</h2>
+	<h1>{title}</h1>
+	<p>发布于 <FormattedDate date={pubDate} /></p>
+	<p>
+	{categories && categories.length > 0 && (
+		<span style="margin-right:20px">
+			分类：
+			{categories.map((category) => (
+				<a href={`/categories/${category}/`} class="tag">{category}</a>
+			))}
+		</span>
+	)}
+	
+	{tags && tags.length > 0 && (
+		<span>
+			标签：
+			{tags.map((tag) => (
+				<a href={`/tags/${tag}/`} class="tag">{tag}</a>
+			))}
+		</span>
+	)}
+	</p>
 
-	<body>
-		<Header />
-		<main>
-			<p></p>
-			<h2>–</h2>
-			<h1>{title}</h1>
-			<p>发布于 <FormattedDate date={pubDate} /></p>
-			<p>
-			{categories && categories.length > 0 && (
-				<span style="margin-right:20px">
-					分类：
-					{categories.map((category) => (
-						<a href={`/categories/${category}/`} class="tag">{category}</a>
-					))}
-				</span>
-			)}
-			
-			{tags && tags.length > 0 && (
-				<span>
-					标签：
-					{tags.map((tag) => (
-						<a href={`/tags/${tag}/`} class="tag">{tag}</a>
-					))}
-				</span>
-			)}
-			</p>
-
-			<div class="post-content content">
-				<hr />
-				<slot />
-			</div>
-			
-			<!-- 评论组件 -->
-			<Comments showLinuxDo={true} />
-		
-		</main>
-	<Footer />
-	</body>
-</html>
+	<div class="post-content content">
+		<hr />
+		<slot />
+	</div>
+	
+	<!-- 评论组件 -->
+	<Comments showLinuxDo={true} />
+</Base>

@@ -1,10 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import FormattedDate from '../components/FormattedDate.astro';
+import Base from './Base.astro';
 
 type Props = CollectionEntry<'page'>['data'] & {
 	content?: string;
@@ -29,132 +26,122 @@ const searchData = posts.map(post => ({
 }));
 ---
 
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={title} description="搜索博客文章" />
-	</head>
+<Base title={title} description="搜索博客文章">
+	<p></p>
+	<h2>–</h2>
+	<h1>{title}</h1>
+	<div class="post-content content">
+		<slot />
+	</div>
 
-	<body>
-		<Header />
-		<main>
-			<p></p>
-			<h2>–</h2>
-			<h1>{title}</h1>
-			<div class="post-content content">
-				<slot />
-			</div>
+	<!-- 搜索区域 -->
+	<div class="search-container">
+		<div class="search-box">
+			<input 
+				type="text" 
+				id="search-input" 
+				placeholder="输入关键词搜索文章..." 
+				autocomplete="off"
+			/>
+		</div>
+		
+		<div id="search-stats" class="search-stats"></div>
+		
+		<div id="search-results" class="search-results">
+			<!-- 搜索结果将在这里显示 -->
+		</div>
+	</div>
 
-			<!-- 搜索区域 -->
-			<div class="search-container">
-				<div class="search-box">
-					<input 
-						type="text" 
-						id="search-input" 
-						placeholder="输入关键词搜索文章..." 
-						autocomplete="off"
-					/>
-				</div>
-				
-				<div id="search-stats" class="search-stats"></div>
-				
-				<div id="search-results" class="search-results">
-					<!-- 搜索结果将在这里显示 -->
-				</div>
-			</div>
-		</main>
-		<Footer />
+	<!-- 搜索数据 -->
+	<script is:inline define:vars={{ searchData }}>
+		// 存储搜索数据到全局变量
+		window.SEARCH_DATA = searchData;
+	</script>
 
-		<!-- 搜索数据 -->
-		<script is:inline define:vars={{ searchData }}>
-			// 存储搜索数据到全局变量
-			window.SEARCH_DATA = searchData;
-		</script>
+	<!-- 搜索功能 -->
+	<script>
+		const searchInput = document.getElementById('search-input') as HTMLInputElement;
+		const searchResults = document.getElementById('search-results') as HTMLElement;
+		const searchStats = document.getElementById('search-stats') as HTMLElement;
 
-		<!-- 搜索功能 -->
-		<script>
-			const searchInput = document.getElementById('search-input') as HTMLInputElement;
-			const searchResults = document.getElementById('search-results') as HTMLElement;
-			const searchStats = document.getElementById('search-stats') as HTMLElement;
+		// 获取搜索数据
+		const posts = (window as any).SEARCH_DATA;
 
-			// 获取搜索数据
-			const posts = (window as any).SEARCH_DATA;
-
-			// 搜索函数
-			function performSearch(query: string) {
-				const keyword = query.trim().toLowerCase();
-				
-				if (!keyword) {
-					searchResults.innerHTML = '';
-					searchStats.innerHTML = '';
-					return;
-				}
-
-				// 搜索逻辑：标题、描述、标签、分类
-				const results = posts.filter((post: any) => {
-					const titleMatch = post.title.toLowerCase().includes(keyword);
-					const descMatch = post.description.toLowerCase().includes(keyword);
-					const tagsMatch = post.tags.some((tag: string) => tag.toLowerCase().includes(keyword));
-					const categoriesMatch = post.categories.some((cat: string) => cat.toLowerCase().includes(keyword));
-					
-					return titleMatch || descMatch || tagsMatch || categoriesMatch;
-				});
-
-				// 显示统计信息
-				searchStats.innerHTML = `找到 <strong>${results.length}</strong> 篇相关文章`;
-
-				// 显示搜索结果
-				if (results.length === 0) {
-					searchResults.innerHTML = '<div class="no-results">😔 没有找到相关文章</div>';
-				} else {
-					const html = results.map((post: any) => {
-						const date = new Date(post.pubDate);
-						const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
-						
-						// 高亮关键词
-						const highlightText = (text: string) => {
-							const regex = new RegExp(`(${keyword})`, 'gi');
-							return text.replace(regex, '<mark>$1</mark>');
-						};
-
-						return `
-							<div class="result-item">
-								<div class="result-header">
-									<h3 class="result-title">
-										<a href="/blog/${post.id}.html">${highlightText(post.title)}</a>
-									</h3>
-									<span class="result-date">${formattedDate}</span>
-								</div>
-								${post.description ? `<p class="result-description">${highlightText(post.description)}</p>` : ''}
-								${post.tags.length > 0 ? `
-									<div class="result-tags">
-										${post.tags.map((tag: string) => `<span class="tag">${tag}</span>`).join('')}
-									</div>
-								` : ''}
-							</div>
-						`;
-					}).join('');
-					
-					searchResults.innerHTML = html;
-				}
+		// 搜索函数
+		function performSearch(query: string) {
+			const keyword = query.trim().toLowerCase();
+			
+			if (!keyword) {
+				searchResults.innerHTML = '';
+				searchStats.innerHTML = '';
+				return;
 			}
 
-			searchInput.addEventListener('keypress', (e) => {
-				if (e.key === 'Enter') {
-					performSearch(searchInput.value);
-				}
+			// 搜索逻辑：标题、描述、标签、分类
+			const results = posts.filter((post: any) => {
+				const titleMatch = post.title.toLowerCase().includes(keyword);
+				const descMatch = post.description.toLowerCase().includes(keyword);
+				const tagsMatch = post.tags.some((tag: string) => tag.toLowerCase().includes(keyword));
+				const categoriesMatch = post.categories.some((cat: string) => cat.toLowerCase().includes(keyword));
+				
+				return titleMatch || descMatch || tagsMatch || categoriesMatch;
 			});
 
-			// 实时搜索（可选）
-			let searchTimeout: number;
-			searchInput.addEventListener('input', () => {
-				clearTimeout(searchTimeout);
-				searchTimeout = window.setTimeout(() => {
-					performSearch(searchInput.value);
-				}, 300);
-			});
-		</script>
-	</body>
-</html>
+			// 显示统计信息
+			searchStats.innerHTML = `找到 <strong>${results.length}</strong> 篇相关文章`;
+
+			// 显示搜索结果
+			if (results.length === 0) {
+				searchResults.innerHTML = '<div class="no-results">😔 没有找到相关文章</div>';
+			} else {
+				const html = results.map((post: any) => {
+					const date = new Date(post.pubDate);
+					const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+					
+					// 高亮关键词
+					const highlightText = (text: string) => {
+						const regex = new RegExp(`(${keyword})`, 'gi');
+						return text.replace(regex, '<mark>$1</mark>');
+					};
+
+					return `
+						<div class="result-item">
+							<div class="result-header">
+								<h3 class="result-title">
+									<a href="/blog/${post.id}.html">${highlightText(post.title)}</a>
+								</h3>
+								<span class="result-date">${formattedDate}</span>
+							</div>
+							${post.description ? `<p class="result-description">${highlightText(post.description)}</p>` : ''}
+							${post.tags.length > 0 ? `
+								<div class="result-tags">
+									${post.tags.map((tag: string) => `<span class="tag">${tag}</span>`).join('')}
+								</div>
+							` : ''}
+						</div>
+					`;
+				}).join('');
+				
+				searchResults.innerHTML = html;
+			}
+		}
+
+		searchInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				performSearch(searchInput.value);
+			}
+		});
+
+		// 实时搜索（可选）
+		let searchTimeout: number;
+		searchInput.addEventListener('input', () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = window.setTimeout(() => {
+				performSearch(searchInput.value);
+			}, 300);
+		});
+	</script>
+</Base>
 
 <style>
 	.search-container {

@@ -1,8 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import Base from './Base.astro';
 import Comments from '../components/Comments.astro';
 
 type Props = CollectionEntry<'page'>['data'] & {
@@ -12,25 +10,15 @@ type Props = CollectionEntry<'page'>['data'] & {
 const { title } = Astro.props;
 ---
 
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={title} description={title} />
-	</head>
-
-	<body>
-		<Header />
-		<main>
-			<p></p>
-			<h2>–</h2>
-			<h1>{title}</h1>
-			<div class="post-content content">
-				<slot />
-			</div>
-			
-			<!-- 评论组件 -->
-			<Comments showLinuxDo={false} />
-		</main>
-		<Footer />
-	</body>
-</html>
+<Base title={title} description={title}>
+	<p></p>
+	<h2>–</h2>
+	<h1>{title}</h1>
+	<div class="post-content content">
+		<slot />
+	</div>
+	
+	<!-- 评论组件 -->
+	<Comments showLinuxDo={false} />
+</Base>
 

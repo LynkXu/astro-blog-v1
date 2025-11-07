@@ -9,6 +9,6 @@ export default defineConfig({
 	site: 'https://zishu.me',
 	integrations: [mdx(), sitemap()],
 	devToolbar: {
-		enabled: true // 禁用开发工具栏
+		enabled: false, // 是否开启开发工具栏
 	},
 });
