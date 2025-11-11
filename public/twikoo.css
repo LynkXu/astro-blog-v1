@@ -83,6 +83,7 @@
     margin-left: 0;
     margin-top: 0.5rem;
   }
+
 }
 
 
@@ -100,6 +101,11 @@
   flex: 1;
   display: flex;
   flex-direction: column-reverse;
+}
+
+.tk-meta .tk-nick {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .tk-meta-input {
@@ -257,6 +263,10 @@
   content: '回复';
 }
 
+.tk-action-icon:hover::after {
+  text-decoration: underline;
+}
+
 .tk-main {
   flex: 1;
   width: 0;
@@ -399,7 +409,7 @@
 
 .tk-replies .tk-comment {
   margin: 0;
-  background: #efeff3;
+  background: #F6F8FA;
   border-radius: 4px;
   padding: 10px 10px 0 10px;
   margin-right: -10px;
@@ -407,6 +417,11 @@
 
 .tk-submit {
   margin-top: 1rem;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 10px;
 }
 
 .tk-expand {
@@ -460,9 +475,10 @@
 }
 
 .tk-comments-container>.tk-comment {
-  border-bottom: 1px solid #eff3fa;
-  padding-bottom: 1em;
-  margin-bottom: 1em;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  padding: 1em;
+  border-radius: 10px;
 }
 
 .tk-comments-no {
@@ -648,6 +664,7 @@
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 0.5em;
+  position: relative;
 }
 
 .tk-admin-comment .tk-avatar {
