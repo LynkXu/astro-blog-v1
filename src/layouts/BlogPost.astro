@@ -32,6 +32,43 @@ const {
 	<!-- LightGallery CSS (本地) -->
 	<link rel='stylesheet' href='/lightgallery/css/lightgallery.min.css' slot='head' />
 
+	<style is:global>
+		/* 代码块复制按钮样式 */
+		.copy-code-button {
+			position: absolute;
+			top: 0.5rem;
+			right: 0.5rem;
+			background-color: #f0f0f0;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 0.25rem 0.5rem;
+			font-size: 0.8rem;
+			cursor: pointer;
+			opacity: 0.6;
+			transition: opacity 0.2s;
+			z-index: 10;
+		}
+
+		.copy-code-button:hover {
+			background-color: #e0e0e0;
+		}
+
+		.copy-code-button.copied {
+			background-color: #4caf50;
+			color: white;
+		}
+
+		/* 当鼠标悬停在代码块上时显示复制按钮 */
+		pre:hover .copy-code-button {
+			opacity: 1;
+		}
+
+		/* 代码块容器相对定位 */
+		pre {
+			position: relative;
+		}
+	</style>
+
 	<p></p>
 	<h2>–</h2>
 	<h1 transition:name={postId ? `post-title-${postId}` : undefined}>{title}</h1>
@@ -193,6 +230,52 @@ const {
 			}
 		}
 
+		// 添加复制按钮到代码块
+		function addCopyButtons() {
+			const codeBlocks = document.querySelectorAll('pre:not(.code-block-added)');
+			codeBlocks.forEach((block) => {
+				// 标记已处理的代码块，避免重复添加
+				block.classList.add('code-block-added');
+
+				// 创建复制按钮
+				const button = document.createElement('button');
+				button.className = 'copy-code-button';
+				button.textContent = '复制';
+				button.setAttribute('aria-label', '复制代码');
+
+				// 添加点击事件
+				button.addEventListener('click', async () => {
+					try {
+						// 获取代码内容
+						const code = block.querySelector('code');
+						if (code) {
+							const text = code.innerText;
+							await navigator.clipboard.writeText(text);
+
+							// 更新按钮状态
+							button.textContent = '已复制';
+							button.classList.add('copied');
+
+							// 2秒后恢复原状态
+							setTimeout(() => {
+								button.textContent = '复制';
+								button.classList.remove('copied');
+							}, 2000);
+						}
+					} catch (err) {
+						console.error('复制失败:', err);
+						button.textContent = '失败';
+						setTimeout(() => {
+							button.textContent = '复制';
+						}, 2000);
+					}
+				});
+
+				// 将按钮添加到代码块
+				block.appendChild(button);
+			});
+		}
+
 		window.addEventListener('DOMContentLoaded', function () {
 			var elements = document.querySelectorAll('.lazy');
 			if (typeof LazyLoad === 'function') {
@@ -202,6 +285,14 @@ const {
 				});
 				window.ll = lazyLoadInstance;
 			}
+
+			// 初始化复制按钮
+			addCopyButtons();
+		});
+
+		// 支持 Astro View Transitions（如果启用的话）
+		document.addEventListener('astro:page-load', function () {
+			addCopyButtons();
 		});
 	</script>
 </Base>
