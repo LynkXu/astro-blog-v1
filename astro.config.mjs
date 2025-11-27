@@ -10,7 +10,7 @@ export default defineConfig({
 	devToolbar: {
 		enabled: false, // 是否开启开发工具栏
 	},
-	compressHTML: true, // 是否压缩 HTML 源代码
+	compressHTML: false, // 是否压缩 HTML 源代码
 
 	markdown: {
 		shikiConfig: {
