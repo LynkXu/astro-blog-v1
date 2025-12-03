@@ -18,8 +18,6 @@
 | `npm run dev`             | 在 `localhost:4321` 启动本地开发服务器         |
 | `npm run build`           | 构建您的生产站点到 `./dist/`                   |
 | `npm run preview`         | 预览本地构建，再部署                           |
-| `npm run astro ...`       | 运行 CLI 命令，例如 `astro add`，`astro check` |
-| `npm run astro -- --help` | 获取 Astro CLI 使用帮助                        |
 
 ## 致谢
 
