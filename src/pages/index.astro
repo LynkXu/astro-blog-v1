@@ -8,9 +8,18 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 // 导入 index.md 文件
 import IndexContent from '../content/index.md';
 
-// 获取最新的博客文章（显示前10篇）
+// 获取最新的博客文章（显示前5篇）
 const allPosts = await getCollection('blog');
-const recentPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 10);
+const recentPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 7);
+
+// 统计标签（同 tags 页风格）
+const tagsMap = new Map<string, number>();
+allPosts.forEach((post) => {
+	(post.data.tags || []).forEach((tag) => {
+		tagsMap.set(tag, (tagsMap.get(tag) || 0) + 1);
+	});
+});
+const sortedTags = Array.from(tagsMap.entries()).sort((a, b) => b[1] - a[1]);
 ---
 
 <Base title={SITE_TITLE} description={SITE_DESCRIPTION}>
@@ -19,8 +28,11 @@ const recentPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pu
 		<IndexContent />
 	</div>
 
-	<div class='indextitle'>最近文章</div>
-	<p></p>
+	<div class='recent-header'>
+		<div class='indextitle'>最近文章</div>
+		<HeaderLink href='/blog'>查看全部 →</HeaderLink>
+	</div>
+	<hr class='section-divider' />
 	<ul class='posts'>
 		{
 			recentPosts.map((post) => (
@@ -37,8 +49,40 @@ const recentPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pu
 			))
 		}
 	</ul>
-	<p class='read-more'>
-		<HeaderLink href='/blog'>查看全部</HeaderLink>
-	</p>
 
+	{sortedTags.length > 0 && (
+		<section class='home-tags'>
+			<div class='indextitle'>标签</div>
+			<hr class='section-divider' />
+			<div class='tags'>
+				{sortedTags.map(([tag]) => (
+					<a href={`/tags/${tag}/`}>
+						{tag}
+					</a>
+				))}
+			</div>
+		</section>
+	)}
+
+	<style>
+		.recent-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.recent-header a {
+			font-size: 0.9rem;
+		}
+
+		.home-tags {
+			margin: 1.5rem 0 1rem;
+		}
+
+		.section-divider {
+			border: none;
+			border-top: 1px solid #e5e5e5;
+			margin: 0.2rem 0 0.8rem;
+		}
+	</style>
 </Base>
