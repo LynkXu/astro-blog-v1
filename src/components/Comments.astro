@@ -11,7 +11,8 @@ const { showLinuxDo = true } = Astro.props;
 const currentPath = Astro.url.pathname;
 const siteOrigin = Astro.site?.origin || 'https://lynkxu.github.io';
 const embedUrl = `${siteOrigin}${currentPath}`;
-const twikooEnv = ''; // 如需启用 Twikoo，请在此填写服务地址
+// Twikoo envId（直接写死在项目里）
+const twikooEnv = 'https://blog-1q8673ibp-links-projects-9e062907.vercel.app/';
 ---
 
 <hr class='sep' />
@@ -37,7 +38,7 @@ const twikooEnv = ''; // 如需启用 Twikoo，请在此填写服务地址
 </div>
 <script is:inline src='https://s4.zstatic.net/npm/twikoo@1.6.44/dist/twikoo.nocss.js'></script>
 
-<script is:inline define:vars={{ embedUrl }}>
+<script is:inline define:vars={{ embedUrl, twikooEnv }}>
 	// 防止重复初始化的标志
 	let isInitializing = false;
 	let discourseLoaded = false;
