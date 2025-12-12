@@ -12,7 +12,9 @@ const currentPath = Astro.url.pathname;
 const siteOrigin = Astro.site?.origin || 'https://lynkxu.github.io';
 const embedUrl = `${siteOrigin}${currentPath}`;
 // Twikoo envId（直接写死在项目里）
-const twikooEnv = 'https://moonlit-mousse-b8e262.netlify.app/';
+// 注意：Netlify 部署 Twikoo 时，这里应该指向 Function 端点，而不是站点根路径，否则会触发 CORS 预检失败
+// 形如：https://<your-site>.netlify.app/.netlify/functions/twikoo
+const twikooEnv = 'https://moonlit-mousse-b8e262.netlify.app/.netlify/functions/twikoo';
 ---
 
 <hr class='sep' />
