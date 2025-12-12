@@ -115,7 +115,7 @@ pre code {
 }
 
 #shuoshuo {
-  margin: 40px auto;
+  margin: 24px auto;
 }
 
 #shuoshuo ul {
@@ -125,28 +125,94 @@ pre code {
 }
 
 #shuoshuo li.comment {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
+  margin-bottom: 0.9rem;
+  padding: 0.8rem 0.9rem;
   background: 0 0;
-  border: 1px solid #e3e3e3;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 0;
   transition: border-color .3s ease;
 }
 
 #shuoshuo li.comment:hover {
-  border-color: #272727;
+  border-color: rgba(0, 0, 0, 0.35);
 }
 
 #shuoshuo .meta {
-  font-size: .85rem;
-  color: #a6a6a6;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: .82rem;
+  line-height: 1.3;
+  color: rgba(0, 0, 0, 0.55);
 }
 
+#shuoshuo .meta .tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+#shuoshuo .body {
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+#shuoshuo .body > :first-child {
+  margin-top: 0;
+}
+
+#shuoshuo .body > :last-child {
+  margin-bottom: 0;
+}
+
+#shuoshuo .body p {
+  margin: 0.35rem 0;
+}
+
+#shuoshuo .body ul,
+#shuoshuo .body ol {
+  margin: 0.35rem 0 0.35rem;
+  padding-left: 1.25rem;
+}
+
+#shuoshuo li.empty {
+  padding: 0.9rem;
+  color: rgba(0, 0, 0, 0.55);
+}
 
 #shuoshuo .body img {
   max-width: 100%;
   border-radius: 8px;
-  margin-top: 10px;
+  margin-top: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #shuoshuo li.comment {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  #shuoshuo li.comment:hover {
+    border-color: rgba(255, 255, 255, 0.32);
+  }
+
+  #shuoshuo .meta {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  #shuoshuo .meta .tag {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  #shuoshuo li.empty {
+    color: rgba(255, 255, 255, 0.6);
+  }
 }
 
 

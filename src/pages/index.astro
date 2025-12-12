@@ -57,7 +57,7 @@ const sortedTags = Array.from(tagsMap.entries()).sort((a, b) => b[1] - a[1]);
 			<div class='tags'>
 				{sortedTags.map(([tag, count]) => (
 					<a href={`/tags/${tag}/`}>
-						{tag} ({count})
+						#{tag} ({count})
 					</a>
 				))}
 			</div>
@@ -85,6 +85,15 @@ const sortedTags = Array.from(tagsMap.entries()).sort((a, b) => b[1] - a[1]);
 
 		.home-tags .indextitle {
 			margin-bottom: 0.3em;
+		}
+
+		.home-tags .tags a {
+			font-size: 0.9rem;
+			text-decoration: underline;
+			text-underline-offset: 2px;
+			/* 防止某些字体把 "(1)" 自动替换成 "①" 等圈号数字 */
+			font-variant-ligatures: none;
+			font-feature-settings: "liga" 0, "clig" 0, "calt" 0;
 		}
 
 		.section-divider {
