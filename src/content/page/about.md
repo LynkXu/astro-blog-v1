@@ -14,10 +14,10 @@ layout: About
 
 
 ### 常用工具/社区
-开发：VSCode / Cursor / Goland <br>
-笔记：Typora / Obsidian / Yuque <br>
+开发：VSCode · Cursor · Goland <br>
+笔记：Typora · Obsidian · Yuque <br>
 
-社区：V2EX / Hacker News / Weibo / X
+社区：V2EX · Hacker News · Weibo · X
 
 ### 联系方式
 
