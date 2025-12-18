@@ -1,0 +1,156 @@
+---
+import Base from '../layouts/Base.astro';
+
+const tools = {
+  software: [
+    { name: 'VS Code', description: '主力编辑器', icon: 'visualstudiocode' },
+    { name: 'Cursor', description: 'AI 辅助编程', icon: 'cursor', invertDark: true }, // Using generic cursor if specific brand not available
+    { name: 'Goland', description: 'Go 语言开发', icon: 'goland' },
+    { name: 'Obsidian', description: '知识库管理', icon: 'obsidian' },
+    { name: 'Typora', description: 'Markdown 写作', icon: 'typora', invertDark: true },
+    { name: 'Yuque', description: '文档协作', icon: 'yuque' },
+  ],
+  hardware: [
+    { name: 'Mac mini m4', description: '主力开发机', icon: 'apple', invertDark: true },
+    { name: 'iPhone 17 Pro', description: '移动设备', icon: 'apple', invertDark: true },
+  ],
+  services: [
+    { name: 'V2EX', description: '创意工作者社区', link: 'https://v2ex.com', icon: 'v2ex', invertDark: true },
+    { name: 'Hacker News', description: '极客新闻', link: 'https://news.ycombinator.com', icon: 'ycombinator' },
+    { name: 'Weibo', description: '随时随地发现新鲜事', link: 'https://weibo.com', icon: 'sinaweibo' },
+    { name: 'X', description: 'What is happening', link: 'https://x.com', icon: 'x', invertDark: true },
+  ]
+};
+
+const title = "常用工具";
+const description = "工欲善其事，必先利其器";
+---
+
+<Base title={title} description={description}>
+  <div class="content">
+    <h1>{title}</h1>
+    <p>{description}</p>
+
+    <div class="tools-section">
+      <h2>软件 / Software</h2>
+      <div class="tools-grid">
+        {tools.software.map(tool => (
+          <div class="tool-card">
+            <div class={`tool-icon ${tool.invertDark ? 'invert-dark' : ''}`}>
+              <img src={`https://cdn.simpleicons.org/${tool.icon}`} alt={`${tool.name} logo`} width="32" height="32" loading="lazy" />
+            </div>
+            <div class="tool-info">
+              <h3>{tool.name}</h3>
+              <p>{tool.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="tools-section">
+        <h2>硬件 / Hardware</h2>
+        <div class="tools-grid">
+          {tools.hardware.map(tool => (
+            <div class="tool-card">
+              <div class={`tool-icon ${tool.invertDark ? 'invert-dark' : ''}`}>
+                <img src={`https://cdn.simpleicons.org/${tool.icon}`} alt={`${tool.name} logo`} width="32" height="32" loading="lazy" />
+              </div>
+              <div class="tool-info">
+                <h3>{tool.name}</h3>
+                <p>{tool.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    <div class="tools-section">
+      <h2>社区 / Community</h2>
+       <div class="tools-grid">
+          {tools.services.map(tool => (
+            <a href={tool.link} target="_blank" class="tool-card link-card">
+              <div class={`tool-icon ${tool.invertDark ? 'invert-dark' : ''}`}>
+                <img src={`https://cdn.simpleicons.org/${tool.icon}`} alt={`${tool.name} logo`} width="32" height="32" loading="lazy" />
+              </div>
+              <div class="tool-info">
+                <h3>{tool.name}</h3>
+                <p>{tool.description}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+    </div>
+  </div>
+
+  <style>
+    .tools-section {
+      margin-bottom: 3rem;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .tool-card {
+      background: var(--code-background-color, #f2f2f2);
+      padding: 1.5rem;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.8rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    :global([data-theme='dark']) .tool-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .tool-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .link-card {
+        text-decoration: none;
+        color: inherit;
+    }
+    .link-card:hover {
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .tool-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tool-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    /* Dark mode inversion for specific black icons */
+    :global([data-theme='dark']) .tool-icon.invert-dark img {
+        filter: invert(1);
+    }
+
+    .tool-info h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--heading-color);
+    }
+    .tool-info p {
+      margin: 0.3rem 0 0;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      line-height: 1.4;
+      color: var(--text-color);
+    }
+  </style>
+</Base>

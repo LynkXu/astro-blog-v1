@@ -10,9 +10,12 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
+    fullWidth?: boolean;
+    hideHeader?: boolean;
+    hideFooter?: boolean;
 }
 
-const { title, description, image } = Astro.props;
+const { title, description, image, fullWidth = false, hideHeader = false, hideFooter = false } = Astro.props;
 
 // Check if current page is homepage
 const isHomepage = Astro.url.pathname === '/';
@@ -24,13 +27,13 @@ const isHomepage = Astro.url.pathname === '/';
 		<BaseHead title={title} description={description} image={image} />
 		<slot name='head' />
 	</head>
-	<body>
+	<body class={fullWidth ? 'full-width' : ''}>
 		<Loading showOnHomepage={isHomepage} />
-		<Header />
+		{!hideHeader && <Header />}
 		<main>
 			<slot />
 		</main>
-		<Footer />
+		{!hideFooter && <Footer />}
 		<SearchModal />
 
 		<button

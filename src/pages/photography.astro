@@ -1,0 +1,137 @@
+---
+import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
+
+// Import all images from src/content/photography
+// 使用 eager: true 以便在构建时处理图片
+const images = import.meta.glob('/src/content/photography/*.{jpg,jpeg,png,webp,gif}', { eager: true });
+const imageList = Object.values(images).map((img: any) => img.default);
+
+const title = "摄影记录";
+const description = "光影的瞬间记录";
+---
+
+<Base title={title} description={description} fullWidth={true} hideHeader={true} hideFooter={false}>
+  <link rel="stylesheet" href="/lightgallery/css/lightgallery.min.css" slot="head" />
+
+  <div class="content">
+    <div class="page-header">
+        <a href="/" class="back-link">
+            ← 返回主页
+        </a>
+        <div class="copyright-header">
+            <span class="copyright-text">
+                © {new Date().getFullYear()} {title}. 所有照片均为本人拍摄，未经允许禁止转载或商用。
+                <a href="/copyright">查看详细版权声明</a>
+            </span>
+        </div>
+    </div>
+    
+    {imageList.length === 0 ? (
+      <p>暂无照片。</p>
+    ) : (
+      <div id="lightgallery" class="gallery-grid">
+        {imageList.map((img) => (
+          <a href={img.src} class="gallery-item" data-src={img.src}>
+              <Image src={img} alt="Photography" width={600} quality={80} class="gallery-img" />
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <script is:inline src="/lightgallery/js/lightgallery.min.js"></script>
+  <script is:inline>
+    // Initialize lightGallery
+    function initGallery() {
+        const el = document.getElementById('lightgallery');
+        if (el && window.lightGallery) {
+            window.lightGallery(el, {
+                speed: 500,
+                selector: '.gallery-item'
+            });
+        }
+    }
+
+    // Run on load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGallery);
+    } else {
+        initGallery();
+    }
+  </script>
+
+  <style>
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .gallery-item {
+      display: block;
+      overflow: hidden;
+      border-radius: 0;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      aspect-ratio: 1;
+    }
+    .gallery-item:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .back-link {
+        font-size: 0.9rem;
+        text-decoration: none;
+        color: var(--text-color);
+        padding: 0.5rem 0;
+        white-space: nowrap;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    .copyright-header {
+        font-size: 0.85rem;
+        color: var(--gray-color);
+        text-align: right;
+    }
+    .copyright-header a {
+        color: var(--text-color);
+        text-decoration: underline;
+        opacity: 0.8;
+        margin-left: 0.5rem;
+    }
+    .copyright-header a:hover {
+        opacity: 1;
+    }
+    
+    @media (max-width: 600px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .copyright-header {
+            text-align: left;
+            font-size: 0.8rem;
+        }
+    }
+  </style>
+</Base>
+

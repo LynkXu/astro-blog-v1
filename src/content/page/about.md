@@ -13,11 +13,12 @@ layout: About
 荒废的爱好：吉他，装机
 
 
-### 常用工具/社区
-开发：VSCode · Cursor · Goland <br>
-笔记：Typora · Obsidian · Yuque <br>
+### 更多
 
-社区：V2EX · Hacker News · Weibo · X
+- [📷 摄影记录](/photography/)
+- [🛠️ 常用工具](/tools/)
+- [⚖️ 版权声明](/copyright/)
+
 
 ### 联系方式
 
@@ -38,8 +39,3 @@ layout: About
 
 使用过的域名：linkblog.cn （powered by TencentCloud）<br>
 使用过的框架：WordPress，Hexo，Jekyll
-
-
-### 其他页面
-
-- [版权声明](/copyright/)
