@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: strava-sync
@@ -38,16 +39,35 @@ jobs:
           # STRAVA_INITIAL_AFTER_EPOCH: "0"
         run: node scripts/strava-sync.mjs
 
-      - name: Commit changes (if any)
+      - name: Detect changes
+        id: changes
         run: |
           if git diff --quiet; then
-            echo "No changes to commit."
-            exit 0
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Commit changes (if any)
+        if: steps.changes.outputs.changed == 'true'
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/data/strava src/data/sports-stats.json
           git commit -m "chore: sync strava data"
           git push
+
+      - name: Trigger Pages deploy (only when data changed)
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Trigger workflow_dispatch for .github/workflows/astro.yml
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "astro.yml",
+              ref: "main",
+            });
 
 
