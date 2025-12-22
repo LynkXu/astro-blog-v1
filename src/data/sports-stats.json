@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-22T14:54:25.248Z",
+  "generatedAt": "2025-12-22T15:21:39.531Z",
   "running": {
     "cards": {
       "totalDistance": {
@@ -12,19 +12,19 @@
         "label": "最远距离",
         "value": "11.2",
         "unit": "km",
-        "subtext": "6'29''/km @2025.12.21"
+        "subtext": "6'29''/km 2025.12.21"
       },
       "best5k": {
         "label": "5K 最快",
         "value": "27.31",
         "unit": "min",
-        "subtext": "5'30''/km"
+        "subtext": "5'30''/km 2025.09.24"
       },
       "best10k": {
         "label": "10K 最快",
         "value": "59:01",
         "unit": "min",
-        "subtext": "5'54''/km"
+        "subtext": "5'54''/km 2025.09.21"
       }
     },
     "monthly": [
@@ -56,11 +56,11 @@
         "unit": "次",
         "subtext": "~19.9 km/次"
       },
-      "totalCalories": {
-        "label": "总热量",
-        "value": "22177",
-        "unit": "kcal",
-        "subtext": "Burn it up!"
+      "farthest": {
+        "label": "最长骑行距离",
+        "value": "132.2",
+        "unit": "km",
+        "subtext": "~27.3 km/h 2024.06.16"
       }
     },
     "monthly": [

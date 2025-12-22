@@ -240,6 +240,27 @@ function computeSportsStats({ baseline, activities, athleteStats }) {
     return 0;
   });
 
+  // --- cycling PR: farthest ride (from activities; stats API doesn't provide this)
+  const bestRide = rides.reduce(
+    (best, a) => {
+      const km = (Number(a.distance_m) || 0) / 1000;
+      return km > (best?.km ?? 0) ? { a, km } : best;
+    },
+    null,
+  );
+  const bestRideKm = bestRide?.km ?? 0;
+  const bestRideDate = bestRide?.a
+    ? formatDateYmdDot(bestRide.a.start_date_local || bestRide.a.start_date)
+    : null;
+  const bestRideAvgKmh = bestRide?.a?.average_speed_mps
+    ? (Number(bestRide.a.average_speed_mps) || 0) * 3.6
+    : null;
+  const bestRideSubtext = bestRideDate
+    ? bestRideAvgKmh
+      ? `~${toFixedTrim(bestRideAvgKmh, 1)} km/h @${bestRideDate}`
+      : `@${bestRideDate}`
+    : null;
+
   // --- running PR: farthest (baseline vs strava)
   const baselineFarthest = baseline.running?.best?.farthest;
   const baselineFarthestKm = Number(baselineFarthest?.distanceKm || 0);
@@ -387,11 +408,11 @@ function computeSportsStats({ baseline, activities, athleteStats }) {
           unit: '次',
           subtext: rideCount > 0 ? `~${toFixedTrim(cyclingAvgKmPerRide, 1)} km/次` : null,
         },
-        totalCalories: {
-          label: '总热量',
-          value: `${Math.trunc(rideCalories)}`,
-          unit: 'kcal',
-          subtext: 'Burn it up!',
+        farthest: {
+          label: '最长骑行距离',
+          value: toFixedTrim(bestRideKm, bestRideKm >= 100 ? 1 : 2),
+          unit: 'km',
+          subtext: bestRideSubtext,
         },
       },
       monthly: groupMonthly(rides),
