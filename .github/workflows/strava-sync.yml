@@ -39,35 +39,53 @@ jobs:
           # STRAVA_INITIAL_AFTER_EPOCH: "0"
         run: node scripts/strava-sync.mjs
 
-      - name: Detect changes
+      - name: Detect meaningful changes (ignore generatedAt/updatedAt-only)
         id: changes
+        shell: bash
         run: |
-          if git diff --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const { execSync } = require("node:child_process");
+          const fs = require("node:fs");
+          const path = require("node:path");
+          function sh(cmd) { return execSync(cmd, { encoding: "utf8" }).trimEnd(); }
+          function readJsonFromGit(refPath) { try { return JSON.parse(sh(`git show HEAD:${refPath}`)); } catch { return null; } }
+          function readJsonFromFs(p) { return JSON.parse(fs.readFileSync(p, "utf8")); }
+          const status = sh("git status --porcelain");
+          if (!status) { process.stdout.write("meaningful=false\n"); process.exit(0); }
+          const lines = status.split("\n").filter(Boolean);
+          const changedFiles = lines
+            .map((l) => l.slice(3))
+            .filter(Boolean)
+            .map((p) => p.split(" -> ").pop()); // handle rename: "old -> new"
+          const ignoreKeyOnly = new Map([
+            ["src/data/sports-stats.json", ["generatedAt"]],
+            ["src/data/strava/state.json", ["updatedAt"]],
+          ]);
+          let meaningful = false;
+          for (const rel of changedFiles) {
+            if (!ignoreKeyOnly.has(rel)) { meaningful = true; break; }
+            const keysToDrop = ignoreKeyOnly.get(rel);
+            const abs = path.join(process.cwd(), rel);
+            if (!fs.existsSync(abs)) { meaningful = true; break; }
+            const cur = readJsonFromFs(abs);
+            const prev = readJsonFromGit(rel);
+            if (!prev) { meaningful = true; break; }
+            for (const k of keysToDrop) {
+              if (cur && typeof cur === "object") delete cur[k];
+              if (prev && typeof prev === "object") delete prev[k];
+            }
+            if (JSON.stringify(cur) !== JSON.stringify(prev)) { meaningful = true; break; }
+          }
+          process.stdout.write(`meaningful=${meaningful}\n`);
+          NODE
 
       - name: Commit changes (if any)
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.changes.outputs.meaningful == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/data/strava src/data/sports-stats.json
           git commit -m "chore: sync strava data"
           git push
-
-      - name: Trigger Pages deploy (only when data changed)
-        if: steps.changes.outputs.changed == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            // Trigger workflow_dispatch for .github/workflows/astro.yml
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: "astro.yml",
-              ref: "main",
-            });
 
 
