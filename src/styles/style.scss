@@ -69,7 +69,7 @@
 // }
 
 body {
-  font-family: "MiSans", __matter_afb301;
+  font-family: "Source Serif 4", "Noto Serif SC", "Source Han Serif CN", serif;
   font-size: var(--font-scale);
   margin: auto;
   padding: 20px;
@@ -452,6 +452,7 @@ pre code {
 
 h1,
 h2 {
+  font-family: "Source Serif 4", "Noto Serif SC", "Source Han Serif CN", serif;
   font-size: 1.7rem;
   color: var(--heading-color);
   display: inherit
@@ -461,6 +462,7 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: "Source Serif 4", "Noto Serif SC", "Source Han Serif CN", serif;
   color: var(--heading-color);
   display: inherit
 }
