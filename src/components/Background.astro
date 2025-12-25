@@ -14,14 +14,12 @@
 
 <script>
   const canvas = document.getElementById('background-canvas');
-  // Check if canvas exists to avoid errors
   if (canvas) {
     const ctx = canvas.getContext('2d');
     let width, height;
     let circles = [];
-
-    // Animation variables
     let animationId;
+    let time = 0;
 
     function resize() {
       width = window.innerWidth;
@@ -33,53 +31,63 @@
 
     function initCircles() {
       circles = [];
-      // Create a few large circles to mimic the original style but dynamic
-      const count = 3;
+      const count = 4;
       for (let i = 0; i < count; i++) {
         circles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          r: Math.min(width, height) * (0.3 + Math.random() * 0.4), // Large radius
-          dx: (Math.random() - 0.5) * 0.5, // Slow movement
-          dy: (Math.random() - 0.5) * 0.5,
+          baseR: Math.min(width, height) * (0.25 + Math.random() * 0.35),
+          dx: (Math.random() - 0.5) * 0.3,
+          dy: (Math.random() - 0.5) * 0.3,
+          phase: Math.random() * Math.PI * 2, // 呼吸相位
+          breathSpeed: 0.008 + Math.random() * 0.006, // 呼吸速度
+          breathAmp: 0.03 + Math.random() * 0.02, // 呼吸幅度
         });
       }
     }
 
     function draw() {
       if (!canvas.isConnected) {
-         cancelAnimationFrame(animationId);
-         return;
+        cancelAnimationFrame(animationId);
+        return;
       }
 
       ctx.clearRect(0, 0, width, height);
+      time += 1;
       
-      // Check for dark mode
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
                      (!document.documentElement.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
       if (isDark) {
-          // In dark mode, we don't draw the background circles to match original behavior
-          animationId = requestAnimationFrame(draw);
-          return;
+        animationId = requestAnimationFrame(draw);
+        return;
       }
 
-      ctx.strokeStyle = '#E3E3E3';
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.4; // Match original opacity
-
-      circles.forEach(circle => {
+      circles.forEach((circle, index) => {
+        // 呼吸效果：半径微微变化
+        const breathOffset = Math.sin(time * circle.breathSpeed + circle.phase) * circle.breathAmp;
+        const currentR = circle.baseR * (1 + breathOffset);
+        
+        // 透明度也随呼吸微微变化
+        const alphaBase = 0.25 + index * 0.08;
+        const alphaOffset = Math.sin(time * circle.breathSpeed + circle.phase) * 0.08;
+        
         ctx.beginPath();
-        ctx.arc(circle.x, circle.y, circle.r, 0, Math.PI * 2);
+        ctx.arc(circle.x, circle.y, currentR, 0, Math.PI * 2);
+        ctx.strokeStyle = '#E3E3E3';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = alphaBase + alphaOffset;
         ctx.stroke();
 
-        // Update position
+        // 更新位置
         circle.x += circle.dx;
         circle.y += circle.dy;
 
-        // Bounce off walls
-        if (circle.x < 0 || circle.x > width) circle.dx = -circle.dx;
-        if (circle.y < 0 || circle.y > height) circle.dy = -circle.dy;
+        // 边界反弹（柔和处理）
+        if (circle.x < -currentR * 0.5) circle.dx = Math.abs(circle.dx);
+        if (circle.x > width + currentR * 0.5) circle.dx = -Math.abs(circle.dx);
+        if (circle.y < -currentR * 0.5) circle.dy = Math.abs(circle.dy);
+        if (circle.y > height + currentR * 0.5) circle.dy = -Math.abs(circle.dy);
       });
 
       animationId = requestAnimationFrame(draw);
