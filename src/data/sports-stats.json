@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2025-12-25T15:16:53.720Z",
+  "generatedAt": "2025-12-27T03:19:47.494Z",
   "running": {
     "cards": {
       "totalDistance": {
         "label": "总跑量(2025.06起)",
-        "value": "386.37",
+        "value": "401.42",
         "unit": "km",
         "subtext": "~6'05''/km"
       },
       "farthest": {
         "label": "最远距离",
-        "value": "11.2",
+        "value": "15.1",
         "unit": "km",
-        "subtext": "6'29''/km @2025.12.21"
+        "subtext": "5'52''/km @2025.12.27"
       },
       "best5k": {
         "label": "5K 最快",
@@ -30,9 +30,9 @@
     "monthly": [
       {
         "month": "2025-12",
-        "distanceKm": "10.05",
-        "count": 1,
-        "movingTimeHours": "0.98"
+        "distanceKm": "25.1",
+        "count": 2,
+        "movingTimeHours": "2.45"
       },
       {
         "month": "2024-05",
