@@ -715,12 +715,12 @@ ul.posts li a:visited {
 }
 
 /* 允许直接放 img，也允许用 figure/figcaption 做说明文字 */
-.post-content .img-grid > img,
 .post-content .img-grid img {
   width: 100%;
-  height: auto;
   display: block;
   border-radius: var(--radius);
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
 }
 
 .post-content .img-grid figure {
