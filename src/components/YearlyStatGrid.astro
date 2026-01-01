@@ -1,0 +1,192 @@
+---
+import StatGrid from './StatGrid.astro';
+import StatCard from './StatCard.astro';
+
+interface Props {
+  type: 'running' | 'cycling';
+  stats: any;
+}
+
+const { type, stats } = Astro.props;
+
+const currentYear = new Date().getFullYear();
+// Create list of years: [current, current-1, ...] available in data
+// Also ensure '2025' is there if user specifically requested checking 2025.
+const availableYears = Object.keys(stats.years || {}).sort().reverse();
+const tabs = [currentYear.toString(), ...availableYears.filter(y => y !== currentYear.toString())];
+
+// Construct data attribute for client-side
+const dataMap = {
+  total: {
+    dist: stats.cards.totalDistance.value,
+    time: stats.cards.totalTime.value,
+    count: stats.cards.totalCount?.value,
+    distLabel: stats.cards.totalDistance.label,
+  },
+  ...Object.fromEntries(
+    Object.entries(stats.years || {}).map(([year, data]: [string, any]) => [
+      year,
+      {
+        dist: data.distance,
+        time: data.time,
+        count: data.count,
+        distLabel: type === 'running' ? `${year} 跑量` : `${year} 里程`,
+      }
+    ])
+  )
+};
+
+const idPrefix = `stats-${type}`;
+---
+
+<div class="stats-switcher-container">
+  <div class="stats-switcher" id={`${idPrefix}-switcher`}>
+    <button class="switcher-btn active" data-year={currentYear.toString()}>{currentYear}</button>
+    {tabs.filter(y => y !== currentYear.toString()).map(y => (
+      <button class="switcher-btn" data-year={y}>{y}</button>
+    ))}
+    <button class="switcher-btn" data-year="total">全部</button>
+  </div>
+</div>
+
+<StatGrid>
+  <StatCard
+    label={stats.cards.totalDistance.label}
+    value={stats.cards.totalDistance.value}
+    unit={stats.cards.totalDistance.unit}
+    subtext={stats.cards.totalDistance.subtext}
+    id={`${idPrefix}-dist-card`}
+  />
+  <StatCard
+    label={stats.cards.totalTime.label}
+    value={stats.cards.totalTime.value}
+    unit={stats.cards.totalTime.unit}
+    subtext={stats.cards.totalTime.subtext}
+    id={`${idPrefix}-time-card`}
+  />
+  
+  {type === 'running' ? (
+    <>
+      <StatCard
+        label={stats.cards.halfMarathon.label}
+        value={stats.cards.halfMarathon.value}
+        unit={stats.cards.halfMarathon.unit}
+        subtext={stats.cards.halfMarathon.subtext}
+      />
+      <StatCard
+        label={stats.cards.fullMarathon.label}
+        value={stats.cards.fullMarathon.value}
+        unit={stats.cards.fullMarathon.unit}
+        subtext={stats.cards.fullMarathon.subtext}
+      />
+    </>
+  ) : (
+    <>
+      <StatCard
+        label={stats.cards.totalCount.label}
+        value={stats.cards.totalCount.value}
+        unit={stats.cards.totalCount.unit}
+        subtext={stats.cards.totalCount.subtext}
+        id={`${idPrefix}-count-card`}
+      />
+      <StatCard
+        label={stats.cards.farthest.label}
+        value={stats.cards.farthest.value}
+        unit={stats.cards.farthest.unit}
+        subtext={stats.cards.farthest.subtext}
+      />
+    </>
+  )}
+</StatGrid>
+
+<script define:vars={{ dataMap, idPrefix }}>
+  const container = document.getElementById(`${idPrefix}-switcher`);
+  if (container) {
+    const btns = container.querySelectorAll('.switcher-btn');
+    
+    // Elements to update
+    const distVal = document.querySelector(`#${idPrefix}-dist-card .stat-value`);
+    const distLabel = document.querySelector(`#${idPrefix}-dist-card .stat-label`);
+    const timeVal = document.querySelector(`#${idPrefix}-time-card .stat-value`);
+    const countVal = document.querySelector(`#${idPrefix}-count-card .stat-value`); // might be null for running
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Toggle active class
+        btns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const year = btn.getAttribute('data-year');
+        const data = dataMap[year] || dataMap['total'];
+
+        // Animate/Update values
+        if (distVal) distVal.textContent = data.dist;
+        if (distLabel && data.distLabel) distLabel.textContent = data.distLabel;
+        if (timeVal) timeVal.textContent = data.time;
+        if (countVal && data.count !== undefined) countVal.textContent = data.count;
+      });
+    });
+  }
+</script>
+
+<style>
+  .stats-switcher-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 1.5rem;
+  }
+  
+  .stats-switcher {
+    display: inline-flex;
+    background: var(--c-bg-soft); /* Assuming theme var exists */
+    padding: 4px;
+    border-radius: 8px;
+    gap: 4px;
+    border: 1px solid var(--c-border); /* Assuming theme var */
+  }
+
+  .switcher-btn {
+    background: transparent;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--c-text-light); /* Assuming theme var */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .switcher-btn:hover {
+    color: var(--c-text);
+  }
+
+  .switcher-btn.active {
+    background: var(--c-bg);
+    color: var(--c-brand); /* or var(--c-text) */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    font-weight: 500;
+  }
+  
+  /* Dark mode fallbacks / Theme vars approximation if specific vars don't exist */
+  :global(.dark) .stats-switcher {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+  
+  :global(html:not(.dark)) .stats-switcher {
+    background: #f1f1f1;
+    border-color: #e5e5e5;
+  }
+  
+  :global(.dark) .switcher-btn.active {
+    background: #3a3a3a;
+    color: #fff;
+  }
+  
+  :global(html:not(.dark)) .switcher-btn.active {
+    background: #fff;
+    color: #000;
+  }
+</style>
+

@@ -1,6 +1,18 @@
 {
   "generatedAt": "2026-01-01T06:36:24.491Z",
   "running": {
+    "years": {
+      "2026": {
+        "distance": "8.05",
+        "time": "0.79",
+        "count": 1
+      },
+      "2025": {
+        "distance": "401.42",
+        "time": "40.61",
+        "count": 2
+      }
+    },
     "cards": {
       "totalDistance": {
         "label": "总跑量(2025.06起)",
@@ -8,23 +20,23 @@
         "unit": "km",
         "subtext": "~6'05''/km"
       },
-      "farthest": {
-        "label": "最远距离",
-        "value": "15.1",
-        "unit": "km",
-        "subtext": "5'52''/km @2025.12.27"
+      "totalTime": {
+        "label": "总时长",
+        "value": "41.4",
+        "unit": "h",
+        "subtext": "在路上的时间"
       },
-      "best5k": {
-        "label": "5K 最快",
-        "value": "27.31",
-        "unit": "min",
-        "subtext": "5'30''/km"
+      "halfMarathon": {
+        "label": "半马 PB",
+        "value": "--",
+        "unit": "",
+        "subtext": "暂无记录"
       },
-      "best10k": {
-        "label": "10K 最快",
-        "value": "58:36",
-        "unit": "min",
-        "subtext": "5'50''/km @2025.12.23"
+      "fullMarathon": {
+        "label": "全马 PB",
+        "value": "--",
+        "unit": "",
+        "subtext": "暂无记录"
       }
     },
     "monthly": [
@@ -49,6 +61,23 @@
     ]
   },
   "cycling": {
+    "years": {
+      "2026": {
+        "distance": "0",
+        "time": "0",
+        "count": 0
+      },
+      "2025": {
+        "distance": "170.65",
+        "time": "9.31",
+        "count": 8
+      },
+      "2024": {
+        "distance": "1381.33",
+        "time": "56.45",
+        "count": 70
+      }
+    },
     "cards": {
       "totalDistance": {
         "label": "总里程",

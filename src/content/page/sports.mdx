@@ -7,6 +7,7 @@ import Tabs from '../../components/Tabs.astro';
 import TabItem from '../../components/TabItem.astro';
 import StatGrid from '../../components/StatGrid.astro';
 import StatCard from '../../components/StatCard.astro';
+import YearlyStatGrid from '../../components/YearlyStatGrid.astro';
 import SportsStyles from '../../components/SportsStyles.astro';
 import sportsStats from '../../data/sports-stats.json';
 
@@ -30,32 +31,7 @@ import sportsStats from '../../data/sports-stats.json';
     
     ### 个人最佳 (PR)
 
-    <StatGrid>
-      <StatCard
-        label={sportsStats.running.cards.totalDistance.label}
-        value={sportsStats.running.cards.totalDistance.value}
-        unit={sportsStats.running.cards.totalDistance.unit}
-        subtext={sportsStats.running.cards.totalDistance.subtext}
-      />
-      <StatCard
-        label={sportsStats.running.cards.farthest.label}
-        value={sportsStats.running.cards.farthest.value}
-        unit={sportsStats.running.cards.farthest.unit}
-        subtext={sportsStats.running.cards.farthest.subtext}
-      />
-      <StatCard
-        label={sportsStats.running.cards.best5k.label}
-        value={sportsStats.running.cards.best5k.value}
-        unit={sportsStats.running.cards.best5k.unit}
-        subtext={sportsStats.running.cards.best5k.subtext}
-      />
-      <StatCard
-        label={sportsStats.running.cards.best10k.label}
-        value={sportsStats.running.cards.best10k.value}
-        unit={sportsStats.running.cards.best10k.unit}
-        subtext={sportsStats.running.cards.best10k.subtext}
-      />
-    </StatGrid>
+    <YearlyStatGrid type="running" stats={sportsStats.running} />
 
     ### 比赛记录
     
@@ -69,32 +45,7 @@ import sportsStats from '../../data/sports-stats.json';
     
     ### 总计
     
-    <StatGrid>
-      <StatCard
-        label={sportsStats.cycling.cards.totalDistance.label}
-        value={sportsStats.cycling.cards.totalDistance.value}
-        unit={sportsStats.cycling.cards.totalDistance.unit}
-        subtext={sportsStats.cycling.cards.totalDistance.subtext}
-      />
-      <StatCard
-        label={sportsStats.cycling.cards.totalTime.label}
-        value={sportsStats.cycling.cards.totalTime.value}
-        unit={sportsStats.cycling.cards.totalTime.unit}
-        subtext={sportsStats.cycling.cards.totalTime.subtext}
-      />
-      <StatCard
-        label={sportsStats.cycling.cards.totalCount.label}
-        value={sportsStats.cycling.cards.totalCount.value}
-        unit={sportsStats.cycling.cards.totalCount.unit}
-        subtext={sportsStats.cycling.cards.totalCount.subtext}
-      />
-      <StatCard
-        label={sportsStats.cycling.cards.farthest.label}
-        value={sportsStats.cycling.cards.farthest.value}
-        unit={sportsStats.cycling.cards.farthest.unit}
-        subtext={sportsStats.cycling.cards.farthest.subtext}
-      />
-    </StatGrid>
+    <YearlyStatGrid type="cycling" stats={sportsStats.cycling} />
 
     ### 月度汇总
     > 按月统计里程与频次，回顾骑行趋势。

@@ -210,6 +210,15 @@ function minimizeActivity(a) {
   };
 }
 
+function parsePaceToSeconds(paceText) {
+  if (!paceText) return 0;
+  const match = paceText.match(/(\d+)'(\d+)''/);
+  if (!match) return 0;
+  const m = parseInt(match[1], 10);
+  const s = parseInt(match[2], 10);
+  return m * 60 + s;
+}
+
 function computeSportsStats({ baseline, activities, athleteStats }) {
   const runs = activities.filter(isRun);
   const rides = activities.filter(isRide);
@@ -225,6 +234,13 @@ function computeSportsStats({ baseline, activities, athleteStats }) {
   const runDistanceKm =
     (baseline.running?.totalDistanceKm || 0) +
     (statsAllRun?.distance != null ? Number(statsAllRun.distance) / 1000 : sum(runs, (a) => a.distance_m) / 1000);
+
+  const baselinePaceSec = parsePaceToSeconds(baseline.running?.avgPaceText);
+  const baselineTimeH = (baseline.running?.totalDistanceKm || 0) * baselinePaceSec / 3600;
+
+  const runTimeH =
+    baselineTimeH +
+    (statsAllRun?.moving_time != null ? Number(statsAllRun.moving_time) / 3600 : sum(runs, (a) => a.moving_time_s) / 3600);
 
   // 骑行：完全依赖 Strava（不加 baseline）
   const rideDistanceKm =
@@ -357,9 +373,62 @@ function computeSportsStats({ baseline, activities, athleteStats }) {
     }));
   };
 
+  const computeYearlyStats = (activities, baselineData = null) => {
+    const years = {};
+    const getYear = (dateStr) => new Date(dateStr).getFullYear().toString();
+    
+    // Process activities
+    for (const a of activities) {
+      const y = getYear(a.start_date_local || a.start_date);
+      if (!years[y]) years[y] = { distance: 0, time: 0, count: 0 };
+      years[y].distance += (Number(a.distance_m) || 0) / 1000;
+      years[y].time += (Number(a.moving_time_s) || 0) / 3600;
+      years[y].count += 1;
+    }
+
+    // Process baseline if provided (Assume baseline belongs to 2025 based on context "2025.06起")
+    // If you need more granular control, baseline.json needs a "year" field.
+    if (baselineData) {
+      const bDist = baselineData.totalDistanceKm || 0;
+      const bPace = parsePaceToSeconds(baselineData.avgPaceText);
+      const bTime = (bDist * bPace) / 3600;
+      // Hardcoded assignment of baseline to 2025 as per user context
+      if (!years['2025']) years['2025'] = { distance: 0, time: 0, count: 0 };
+      years['2025'].distance += bDist;
+      years['2025'].time += bTime;
+      // Count is unknown in baseline, ignore or estimate? 
+      // Keeping it 0 for baseline part to avoid skewing "avg per ride" if used, 
+      // but strictly speaking we don't have baseline count.
+    }
+
+    // Format output
+    const out = {};
+    Object.keys(years).sort().reverse().forEach(y => {
+      out[y] = {
+        distance: toFixedTrim(years[y].distance, 2),
+        time: toFixedTrim(years[y].time, 1),
+        count: years[y].count
+      };
+    });
+    return out;
+  };
+
+  const runYears = computeYearlyStats(runs, baseline.running);
+  const rideYears = computeYearlyStats(rides); // No baseline for cycling logic in original script? 
+  // Wait, original script had: cycling statsAllRide (totals) but no baseline file usage for cycling separate from stats.
+  // Actually baseline.json HAS cycling data: "totalDistanceKm": 1455.36
+  // But original script logic was:
+  // "骑行：完全依赖 Strava（不加 baseline）" -> "const rideDistanceKm = statsAllRide?.distance ..."
+  // However, statsAllRide comes from Strava "All Time" stats.
+  // To get yearly breakdown including historical non-strava data if any, we'd need it.
+  // But since the comment says "Depend entirely on Strava", I will stick to activities for the yearly breakdown.
+  // NOTE: Strava API "statsAllRide" gives TOTALs. Individual activities give yearly data.
+  // If Strava has all history, summing activities = total.
+  
   return {
     generatedAt: new Date().toISOString(),
     running: {
+      years: runYears,
       cards: {
         totalDistance: {
           label: `总跑量(${baseline.running?.sinceLabel || '累计'})`,
@@ -367,28 +436,29 @@ function computeSportsStats({ baseline, activities, athleteStats }) {
           unit: 'km',
           subtext: baseline.running?.avgPaceText || null,
         },
-        farthest: {
-          label: '最远距离',
-          value: farthestValue,
-          unit: 'km',
-          subtext: farthestSubtext,
+        totalTime: {
+          label: '总时长',
+          value: toFixedTrim(runTimeH, 1),
+          unit: 'h',
+          subtext: '在路上的时间',
         },
-        best5k: {
-          label: '5K 最快',
-          value: best5kValue,
-          unit: best5kUnit,
-          subtext: best5kSub,
+        halfMarathon: {
+          label: '半马 PB',
+          value: '--',
+          unit: '',
+          subtext: '暂无记录',
         },
-        best10k: {
-          label: '10K 最快',
-          value: best10kValue,
-          unit: best10kUnit,
-          subtext: best10kSub,
+        fullMarathon: {
+          label: '全马 PB',
+          value: '--',
+          unit: '',
+          subtext: '暂无记录',
         },
       },
       monthly: groupMonthly(runs),
     },
     cycling: {
+      years: rideYears,
       cards: {
         totalDistance: {
           label: '总里程',

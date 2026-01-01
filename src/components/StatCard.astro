@@ -1,8 +1,8 @@
 ---
-const { label, value, unit, subtext } = Astro.props;
+const { label, value, unit, subtext, id } = Astro.props;
 ---
 
-<div class="stat-card">
+<div class="stat-card" id={id}>
   <div class="stat-label">{label}</div>
   <div class="stat-main">
     <span class="stat-value">{value}</span>

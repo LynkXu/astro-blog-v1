@@ -5,23 +5,28 @@
     border-radius: 6px;
     overflow: hidden;
     margin-bottom: 1.5rem;
+    width: 100%;
   }
 
   .poster-wrap {
-    padding: 0.4rem 0.4rem 0;
+    padding: 0.3rem 0.5rem 0;
+    display: flex;
+    justify-content: center;
   }
 
   .poster-img {
     display: block;
     width: 100%;
     height: auto;
+    max-height: 160px;
+    object-fit: contain;
   }
 
   .strava-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.3rem 0.5rem;
+    padding: 0 0.5rem 0.3rem;
   }
 
   .strava-year {
