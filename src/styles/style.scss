@@ -91,6 +91,9 @@ body {
   line-height: 1.8;
   color: var(--text-color);
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 
   /*
     减轻“看起来像加粗”的观感：
@@ -113,6 +116,11 @@ body {
     max-width: 100%;
     padding: 20px 40px;
   }
+}
+
+main {
+    flex: 1;
+    width: 100%;
 }
 
 /* Blog post header meta (date / categories / tags) */
@@ -600,16 +608,28 @@ blockquote {
 }
 
 header {
-  padding: 20px 0;
+  padding: 40px 0 60px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 40px;
+}
+
+:root[data-theme="dark"] header {
+    border-bottom-color: rgba(255,255,255,0.05);
 }
 
 footer {
-  padding: 20px 0;
+  padding: 60px 0 40px;
+  margin-top: auto;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+:root[data-theme="dark"] footer {
+    border-top-color: rgba(255,255,255,0.05);
 }
 
 .title a:hover {

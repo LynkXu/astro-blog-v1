@@ -67,13 +67,24 @@ const sortedTags = Array.from(tagsMap.entries()).sort((a, b) => b[1] - a[1]);
 	)}
 
 	<style>
-		/* 座右铭样式优化 */
+		/* 座右铭样式优化 - Minimal Sans */
 		.motto {
-			font-size: 1.1em;
-			font-style: italic;
-			color: var(--heading-color);
-			opacity: 0.8;
-			margin-bottom: 0;
+			font-family: system-ui, -apple-system, sans-serif;
+			font-size: 0.95em;
+			font-weight: 400;
+			color: var(--gray-color);
+			opacity: 1;
+			margin: 0.5rem 0;
+			letter-spacing: 0.05em;
+			text-transform: uppercase; /* 全大写，增加一种冷淡的秩序感 */
+		}
+
+		.motto :global(p) {
+			margin: 0;
+		}
+
+		.motto :global(p)::before {
+			content: none;
 		}
 
 		/* 增加与上方座右铭的距离 */
