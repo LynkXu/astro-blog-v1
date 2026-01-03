@@ -28,6 +28,22 @@ function avgKmPerCountText(distText: any, count: any) {
   return `~${toFixedTrim(avg, 1)} km/次`;
 }
 
+function paceText(distKmText: any, timeHoursText: any) {
+  const distKm = Number(distKmText) || 0;
+  const timeHours = Number(timeHoursText) || 0;
+  if (distKm <= 0 || timeHours <= 0) return '暂无记录';
+  const totalSeconds = timeHours * 3600;
+  const secPerKm = totalSeconds / distKm;
+  let mm = Math.floor(secPerKm / 60);
+  let ss = Math.round(secPerKm - mm * 60);
+  if (ss === 60) {
+    mm += 1;
+    ss = 0;
+  }
+  const ssText = String(ss).padStart(2, '0');
+  return `~${mm}'${ssText}''/km`;
+}
+
 // Construct data attribute for client-side
 const dataMap = {
   total: {
@@ -47,13 +63,29 @@ const dataMap = {
         time: data.time,
         count: data.count,
         distLabel: type === 'running' ? `${year} 跑量` : `${year} 里程`,
-        distSub: type === 'running' ? stats.cards.totalDistance.subtext : '本年度累计',
+        // running: 这里显示“平均速度/配速”，需要随年份重算（而不是使用 total 的常量 subtext）
+        distSub: type === 'running' ? paceText(data.distance, data.time) : '本年度累计',
         timeSub: stats.cards.totalTime.subtext,
         countSub: type === 'cycling' ? avgKmPerCountText(data.distance, data.count) : null,
       }
     ])
   )
 };
+
+// 当前年份按钮始终存在，但数据可能不存在（例如骑行没有 2026）。
+// 如果不存在，就补一个空数据，避免点击时回退到 total 导致显示“错乱”。
+const currentYearKey = currentYear.toString();
+if (!((dataMap as any)[currentYearKey])) {
+  (dataMap as any)[currentYearKey] = {
+    dist: '0',
+    time: '0',
+    count: 0,
+    distLabel: type === 'running' ? `${currentYearKey} 跑量` : `${currentYearKey} 里程`,
+    distSub: type === 'running' ? '暂无记录' : '本年度累计',
+    timeSub: stats.cards.totalTime.subtext,
+    countSub: type === 'cycling' ? '暂无记录' : null,
+  };
+}
 
 // Initial year shown on first paint should match the active switcher button.
 // Always default to current year (even if it has no data).
@@ -65,7 +97,7 @@ const initialData =
     time: '0',
     count: 0,
     distLabel: type === 'running' ? `${initialKey} 跑量` : `${initialKey} 里程`,
-    distSub: type === 'running' ? stats.cards.totalDistance.subtext : '本年度累计',
+    distSub: type === 'running' ? '暂无记录' : '本年度累计',
     timeSub: stats.cards.totalTime.subtext,
     countSub: type === 'cycling' ? '暂无记录' : null,
   };
@@ -233,12 +265,12 @@ const hasMonthlyData = (year: string) => monthlyGroups[year] && monthlyGroups[ye
 
         // Animate/Update values
         if (distVal) distVal.textContent = data.dist;
-        if (distLabel && data.distLabel) distLabel.textContent = data.distLabel;
-        if (distSub && data.distSub) distSub.textContent = data.distSub;
+        if (distLabel) distLabel.textContent = data.distLabel ?? '';
+        if (distSub) distSub.textContent = data.distSub ?? '';
         if (timeVal) timeVal.textContent = data.time;
-        if (timeSub && data.timeSub) timeSub.textContent = data.timeSub;
+        if (timeSub) timeSub.textContent = data.timeSub ?? '';
         if (countVal && data.count !== undefined) countVal.textContent = data.count;
-        if (countSub && data.countSub) countSub.textContent = data.countSub;
+        if (countSub) countSub.textContent = data.countSub ?? '';
 
         // Toggle active class for detail groups
         if (detailSection) {
