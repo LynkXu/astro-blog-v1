@@ -2,8 +2,17 @@
 import { getCollection } from 'astro:content';
 import { filterDrafts } from '../utils/drafts';
 
-// 获取所有博客文章用于搜索
-const allPosts = filterDrafts(await getCollection('blog'));
+// 获取当前语言（根据 URL 路径判断）
+const currentLang = Astro.url.pathname.startsWith('/en/') ? 'en' : 'zh';
+
+// 获取对应语言的博客文章用于搜索
+const allPosts = filterDrafts(await getCollection('blog')).filter((post) => {
+	if (currentLang === 'en') {
+		return post.id.startsWith('en/');
+	} else {
+		return !post.id.startsWith('en/');
+	}
+});
 const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 // 创建搜索索引数据
@@ -16,6 +25,25 @@ const searchData = posts.map((post) => ({
 	categories: post.data.categories || [],
 	draft: Boolean(post.data.draft),
 }));
+
+// 根据语言设置文本
+const texts = currentLang === 'en' ? {
+	placeholder: 'Search articles...',
+	closeLabel: 'Close search',
+	searchTip: '💡 Search: title, description, tags, categories',
+	keyboardTip: '⌨️ Press <kbd>Esc</kbd> to close',
+	resultsCount: 'Found <strong>{count}</strong> articles',
+	noResults: '😔 No articles found',
+	draftBadge: 'Draft',
+} : {
+	placeholder: '搜索文章...',
+	closeLabel: '关闭搜索',
+	searchTip: '💡 支持搜索：标题、描述、标签、分类',
+	keyboardTip: '⌨️ 按 <kbd>Esc</kbd> 关闭弹窗',
+	resultsCount: '找到 <strong>{count}</strong> 篇相关文章',
+	noResults: '😔 没有找到相关文章',
+	draftBadge: '草稿',
+};
 ---
 
 <!-- 搜索弹窗 -->
@@ -23,35 +51,37 @@ const searchData = posts.map((post) => ({
 	<div class="search-modal-overlay"></div>
 	<div class="search-modal-content">
 		<div class="search-modal-header">
-			<div class="search-box">
-				<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<circle cx="11" cy="11" r="8"></circle>
-					<path d="m21 21-4.35-4.35"></path>
+		<div class="search-box">
+			<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<circle cx="11" cy="11" r="8"></circle>
+				<path d="m21 21-4.35-4.35"></path>
+			</svg>
+			<input type="text" id="modal-search-input" placeholder={texts.placeholder} autocomplete="off" />
+			<button class="close-btn" id="close-search-modal" aria-label={texts.closeLabel}>
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<line x1="18" y1="6" x2="6" y2="18"></line>
+					<line x1="6" y1="6" x2="18" y2="18"></line>
 				</svg>
-				<input type="text" id="modal-search-input" placeholder="搜索文章..." autocomplete="off" />
-				<button class="close-btn" id="close-search-modal" aria-label="关闭搜索">
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<line x1="18" y1="6" x2="6" y2="18"></line>
-						<line x1="6" y1="6" x2="18" y2="18"></line>
-					</svg>
-				</button>
-			</div>
+			</button>
+		</div>
 		</div>
 
 		<div id="modal-search-stats" class="search-stats"></div>
 
-		<div id="modal-search-results" class="search-results">
-			<div class="search-tips">
-				<p>💡 支持搜索：标题、描述、标签、分类</p>
-				<p>⌨️ 按 <kbd>Esc</kbd> 关闭弹窗</p>
-			</div>
+	<div id="modal-search-results" class="search-results">
+		<div class="search-tips">
+			<p set:html={texts.searchTip}></p>
+			<p set:html={texts.keyboardTip}></p>
 		</div>
+	</div>
 	</div>
 </div>
 
 <!-- 搜索数据 -->
-<script is:inline define:vars={{ searchData }}>
+<script is:inline define:vars={{ searchData, texts, currentLang }}>
 	window.SEARCH_DATA = searchData;
+	window.SEARCH_TEXTS = texts;
+	window.SEARCH_LANG = currentLang;
 </script>
 
 <!-- 搜索功能 -->
@@ -68,8 +98,13 @@ const searchData = posts.map((post) => ({
 			return;
 		}
 
-		// 获取搜索数据
+		// 获取搜索数据和文本
 		const posts = window.SEARCH_DATA || [];
+		const texts = window.SEARCH_TEXTS || {};
+		const currentLang = window.SEARCH_LANG || 'zh';
+
+		// 生成默认提示 HTML
+		const tipsHtml = '<div class="search-tips"><p>' + texts.searchTip + '</p><p>' + texts.keyboardTip + '</p></div>';
 
 		// 打开弹窗
 		window.openSearchModal = function() {
@@ -83,7 +118,7 @@ const searchData = posts.map((post) => ({
 			searchModal.classList.remove('active');
 			document.body.style.overflow = '';
 			searchInput.value = '';
-			searchResults.innerHTML = '<div class="search-tips"><p>💡 支持搜索：标题、描述、标签、分类</p><p>⌨️ 按 <kbd>Esc</kbd> 关闭弹窗</p></div>';
+			searchResults.innerHTML = tipsHtml;
 			searchStats.innerHTML = '';
 		}
 
@@ -92,7 +127,7 @@ const searchData = posts.map((post) => ({
 			const keyword = query.trim().toLowerCase();
 
 			if (!keyword) {
-				searchResults.innerHTML = '<div class="search-tips"><p>💡 支持搜索：标题、描述、标签、分类</p><p>⌨️ 按 <kbd>Esc</kbd> 关闭弹窗</p></div>';
+				searchResults.innerHTML = tipsHtml;
 				searchStats.innerHTML = '';
 				return;
 			}
@@ -108,11 +143,11 @@ const searchData = posts.map((post) => ({
 			});
 
 			// 显示统计信息
-			searchStats.innerHTML = '找到 <strong>' + results.length + '</strong> 篇相关文章';
+			searchStats.innerHTML = texts.resultsCount.replace('{count}', results.length);
 
 			// 显示搜索结果
 			if (results.length === 0) {
-				searchResults.innerHTML = '<div class="no-results">😔 没有找到相关文章</div>';
+				searchResults.innerHTML = '<div class="no-results">' + texts.noResults + '</div>';
 			} else {
 				const html = results
 					.map(function(post) {
@@ -132,12 +167,15 @@ const searchData = posts.map((post) => ({
 								'</div>';
 						}
 
-						var draftHtml = post.draft ? '<span class="draft-badge" aria-label="草稿">草稿</span>' : '';
+						var draftHtml = post.draft ? '<span class="draft-badge" aria-label="' + texts.draftBadge + '">' + texts.draftBadge + '</span>' : '';
+
+						// 根据语言确定博客 URL
+						var blogUrl = currentLang === 'en' ? '/en/blog/' + post.id.replace('en/', '') + '.html' : '/blog/' + post.id + '.html';
 
 						return '<div class="result-item">' +
 							'<div class="result-header">' +
 								'<h3 class="result-title">' +
-									'<a href="/blog/' + post.id + '.html">' + highlightText(post.title) + '</a>' +
+									'<a href="' + blogUrl + '">' + highlightText(post.title) + '</a>' +
 									draftHtml +
 								'</h3>' +
 								'<span class="result-date">' + formattedDate + '</span>' +
